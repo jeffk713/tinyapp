@@ -19,26 +19,25 @@
       </div>
     </div>
     <div class="nav-item nav-link">
-      <% if(!username) { %>
-      <form method="POST" action="/login" style="display: flex">
-        <input
-          class="form-control"
-          type="text"
-          name="username"
-          placeholder="Username"
-          style="margin-top: 4px"
-        />
-        <button
-          class="btn"
-          style="border: solid 1px black; margin-left: 10px; font-size: 20px"
-          type="submit"
-        >
-          Login
-        </button>
-      </form>
+      <% if(!user) { %>
+      <a
+        href="/register"
+        style="color: black; font-size: 20px; text-decoration: none"
+        >Sign Up</a
+      >
+      <a
+        href="/login"
+        style="
+          color: black;
+          font-size: 20px;
+          text-decoration: none;
+          margin-left: 10px;
+        "
+        >Sign In</a
+      >
       <% } else { %>
       <form method="GET" action="/logout" style="display: flex">
-        <h4 style="margin-top: 10px">Logged In As: <%= username %></h4>
+        <h4 style="margin-top: 10px">Logged In As: <%= user.email %></h4>
         <button
           class="btn"
           style="border: solid 1px black; margin-left: 10px; font-size: 20px"
