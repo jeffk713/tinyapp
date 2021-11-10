@@ -23,13 +23,19 @@ app.get('/', (req, res) => {
 
 // go to actual URL from short URL
 app.get('/u/:shortURL', (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL];
-  res.redirect(longURL);
+  const url = urlDatabase[req.params.shortURL];
+  if (!url) {
+    return res.render('page_not_found');
+  }
+
+  res.redirect(url.longURL);
 });
 
 app.use('/urls', urlRouter);
 
 app.use('/', userRouter);
+
+app.use('*', (req, res) => res.render('page_not_found'));
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);

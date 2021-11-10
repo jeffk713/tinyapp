@@ -21,10 +21,14 @@ router.get('/', (req, res) => {
 // new URL add page
 router.get('/new', (req, res) => {
   const userId = req.cookies.userId;
+  if (!userId) {
+    return res.redirect('/login');
+  }
+
   const templateVars = {
     user: userDatabase[userId],
   };
-  res.render('urls_new', templateVars);
+  return res.render('urls_new', templateVars);
 });
 
 // URL detail page
@@ -33,7 +37,8 @@ router.get('/:shortURL', (req, res) => {
   const templateVars = {
     user: userDatabase[userId],
     shortURL: req.params.shortURL,
-    longURL: urlDatabase[req.params.shortURL],
+    longURL: urlDatabase[req.params.shortURL].longURL,
+    userId,
   };
 
   res.render('urls_show', templateVars);
@@ -44,8 +49,9 @@ router.get('/:shortURL', (req, res) => {
 // Create short URL
 router.post('/', (req, res) => {
   const { longURL } = req.body;
+  const { userId } = req.cookies;
   const shortURL = generateRandomString(6);
-  urlDatabase[shortURL] = longURL;
+  urlDatabase[shortURL] = { longURL, userId };
 
   res.redirect('/urls');
 });
@@ -61,7 +67,7 @@ router.post('/:shortURL/delete', (req, res) => {
 router.post('/:shortURL', (req, res) => {
   const { longURL } = req.body;
   const urlToEdit = req.params.shortURL;
-  urlDatabase[urlToEdit] = longURL;
+  urlDatabase[urlToEdit].longURL = longURL;
   res.redirect('/urls');
 });
 
