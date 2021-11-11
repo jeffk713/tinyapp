@@ -70,7 +70,7 @@ router.post('/', (req, res) => {
   const { longURL } = req.body;
   const { userId } = req.cookies;
   const shortURL = generateRandomString(6);
-  urlDatabase[shortURL] = { longURL, userId };
+  urlDatabase[shortURL] = { longURL: `https://${longURL}`, userId };
 
   res.redirect('/urls');
 });
