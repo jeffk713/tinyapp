@@ -1,7 +1,8 @@
 const express = require('express');
 
 const bodyParser = require('body-parser');
-const cookieParser = require('cookie-parser');
+// const cookieParser = require('cookie-parser');
+const cookieSession = require('cookie-session');
 
 const urlDatabase = require('./database/url_database');
 
@@ -14,7 +15,13 @@ const PORT = 8080; // default port 8080
 app.set('view engine', 'ejs');
 
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cookieParser());
+// app.use(cookieParser());
+app.use(
+  cookieSession({
+    name: 'cookieSession',
+    keys: ['super', 'duper'],
+  })
+);
 
 // home page
 app.get('/', (req, res) => {

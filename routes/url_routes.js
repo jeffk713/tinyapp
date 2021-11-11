@@ -12,7 +12,7 @@ const generateRandomString = require('../helpers/random_string');
 
 // urls_index page
 router.get('/', (req, res) => {
-  const userId = req.cookies.userId;
+  const userId = req.session.userId;
 
   const userUrlList = getUrlsForUser(userId);
   const templateVars = {
@@ -24,7 +24,7 @@ router.get('/', (req, res) => {
 
 // new URL add page
 router.get('/new', (req, res) => {
-  const userId = req.cookies.userId;
+  const userId = req.session.userId;
   if (!userId) {
     return res.redirect('/login');
   }
@@ -37,7 +37,7 @@ router.get('/new', (req, res) => {
 
 // URL detail page
 router.get('/:shortURL', (req, res) => {
-  const { userId } = req.cookies;
+  const { userId } = req.session;
   const urlObj = urlDatabase[req.params.shortURL];
 
   if (!urlObj) {
@@ -68,7 +68,7 @@ router.get('/:shortURL', (req, res) => {
 // Create short URL
 router.post('/', (req, res) => {
   const { longURL } = req.body;
-  const { userId } = req.cookies;
+  const { userId } = req.session;
   const shortURL = generateRandomString(6);
   urlDatabase[shortURL] = { longURL: `https://${longURL}`, userId };
 
@@ -77,7 +77,7 @@ router.post('/', (req, res) => {
 
 // Delete URL
 router.post('/:shortURL/delete', (req, res) => {
-  const userId = req.cookies.userId;
+  const userId = req.session.userId;
   const urlKeyToRemove = req.params.shortURL;
   const urlToRemove = urlDatabase[urlKeyToRemove];
 
@@ -94,7 +94,7 @@ router.post('/:shortURL/delete', (req, res) => {
 
 // Update long URL
 router.post('/:shortURL', (req, res) => {
-  const userId = req.cookies.userId;
+  const userId = req.session.userId;
   const urlKeyToEdit = req.params.shortURL;
   const urlToEdit = urlDatabase[urlKeyToEdit];
 

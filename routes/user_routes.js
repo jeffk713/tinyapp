@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 
+const bcrypt = require('bcryptjs');
+
 const userDatabase = require('../database/user_database');
 
 const helperWithUserDB = require('../helpers/helper_with_userDB');
@@ -12,11 +14,11 @@ const { isEmailOccupied, getUserFromEmail } = helperWithUserDB(userDatabase);
 
 // Logout user
 router.get('/logout', (req, res) => {
-  res.clearCookie('userId');
+  req.session = null;
   res.redirect('/urls');
 });
 
-// Sign up user
+// Sign up page
 router.get('/register', (req, res) => {
   const templateVars = {
     user: null,
@@ -25,7 +27,7 @@ router.get('/register', (req, res) => {
   res.render('user_sign_up', templateVars);
 });
 
-// Sign in user
+// Sign in page
 router.get('/login', (req, res) => {
   const templateVars = {
     user: null,
@@ -44,12 +46,15 @@ router.post('/login', (req, res) => {
   if (!user) {
     return res.status(403).send('credentials are invalid');
   }
-  if (user.password !== password) {
-    return res.status(403).send('credentials are invalid');
-  }
 
-  res.cookie('userId', user.id);
-  res.redirect('/urls');
+  bcrypt.compare(password, user.password).then(response => {
+    if (response) {
+      req.session.userId = user.id;
+      return res.redirect('/urls');
+    } else {
+      res.status(400).send('wrong password');
+    }
+  });
 });
 
 // Sign up user
@@ -66,11 +71,19 @@ router.post('/register', (req, res) => {
   }
 
   const userRandomId = generateRandomString(8);
-  const newUser = { email, password, id: userRandomId };
-  userDatabase[userRandomId] = newUser;
 
-  res.cookie('userId', userRandomId);
-  res.redirect('/urls');
+  const newUser = { email, password, id: userRandomId };
+
+  bcrypt.genSalt(10, (err, salt) => {
+    bcrypt.hash(password, salt, (err, hash) => {
+      newUser.password = hash;
+      console.log(newUser);
+      userDatabase[userRandomId] = newUser;
+
+      req.session.userId = userRandomId;
+      res.redirect('/urls');
+    });
+  });
 });
 
 module.exports = router;
