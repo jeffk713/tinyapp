@@ -104,7 +104,7 @@ router.post('/:shortURL', (req, res) => {
   }
 
   const { longURL } = req.body;
-  urlToEdit.longURL = longURL;
+  urlToEdit.longURL = `https://${longURL}`;
   res.redirect('/urls');
 });
 
