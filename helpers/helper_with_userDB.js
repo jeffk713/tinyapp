@@ -1,4 +1,4 @@
-module.exports = emailHelperWithDB = userDB => {
+module.exports = helperWithUserDB = userDB => {
   const isEmailOccupied = newEmail => {
     for (const userKey in userDB) {
       if (newEmail === userDB[userKey].email) {

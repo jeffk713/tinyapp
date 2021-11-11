@@ -3,10 +3,12 @@ const router = express.Router();
 
 const userDatabase = require('../database/user_database');
 
-const emailHelperWithDB = require('../helpers/email_helper');
+const helperWithUserDB = require('../helpers/helper_with_userDB');
 const generateRandomString = require('../helpers/random_string');
 
-const { isEmailOccupied, getUserFromEmail } = emailHelperWithDB(userDatabase);
+const { isEmailOccupied, getUserFromEmail } = helperWithUserDB(userDatabase);
+
+//========GET===========//
 
 // Logout user
 router.get('/logout', (req, res) => {
@@ -32,6 +34,8 @@ router.get('/login', (req, res) => {
   res.render('user_sign_in', templateVars);
 });
 
+//==========POST===========//
+
 // Login user
 router.post('/login', (req, res) => {
   const { email, password } = req.body;
@@ -45,7 +49,6 @@ router.post('/login', (req, res) => {
   }
 
   res.cookie('userId', user.id);
-
   res.redirect('/urls');
 });
 
@@ -67,8 +70,6 @@ router.post('/register', (req, res) => {
   userDatabase[userRandomId] = newUser;
 
   res.cookie('userId', userRandomId);
-
-  console.log(userDatabase);
   res.redirect('/urls');
 });
 
