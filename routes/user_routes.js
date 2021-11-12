@@ -66,7 +66,6 @@ router.post('/register', (req, res) => {
   }
 
   if (isEmailOccupied(email)) {
-    console.log(userDatabase);
     return res.status(400).send('Email is occupied');
   }
 
@@ -77,7 +76,6 @@ router.post('/register', (req, res) => {
   bcrypt.genSalt(10, (err, salt) => {
     bcrypt.hash(password, salt, (err, hash) => {
       newUser.password = hash;
-      console.log(newUser);
       userDatabase[userRandomId] = newUser;
 
       req.session.userId = userRandomId;
