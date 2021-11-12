@@ -29,6 +29,12 @@ router.get('/register', (req, res) => {
 
 // Sign in page
 router.get('/login', (req, res) => {
+  const userId = req.session.userId;
+  const user = userDatabase[userId];
+  if (user) {
+    res.redirect('/urls');
+  }
+
   const templateVars = {
     user: null,
   };
@@ -44,7 +50,12 @@ router.post('/login', (req, res) => {
   const user = getUserFromEmail(email);
 
   if (!user) {
-    return res.status(403).send('credentials are invalid');
+    return res
+      .status(403)
+      .render('bad_request', {
+        page: 'sign-in',
+        msg: 'User credentials are invalid',
+      });
   }
 
   bcrypt.compare(password, user.password).then(response => {
@@ -52,7 +63,12 @@ router.post('/login', (req, res) => {
       req.session.userId = user.id;
       return res.redirect('/urls');
     } else {
-      res.status(400).send('wrong password');
+      res
+        .status(400)
+        .render('bad_request', {
+          page: 'sign-in',
+          msg: 'User credentials are invalid',
+        });
     }
   });
 });
@@ -62,11 +78,18 @@ router.post('/register', (req, res) => {
   const { email, password } = req.body;
 
   if (email === '' || password === '') {
-    return res.status(400).send('No input entered');
+    return res
+      .status(400)
+      .render('bad_request', {
+        page: 'sign-up',
+        msg: 'Please input correctly',
+      });
   }
 
   if (isEmailOccupied(email)) {
-    return res.status(400).send('Email is occupied');
+    return res
+      .status(400)
+      .render('bad_request', { page: 'sign-up', msg: 'User already exists' });
   }
 
   const userRandomId = generateRandomString(8);

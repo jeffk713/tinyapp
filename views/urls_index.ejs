@@ -18,6 +18,10 @@
   </head>
   <%- include('partials/_header') %>
   <body>
+    <% if(!user) {%>
+    <h2>Access denieds</h2>
+    <a href="/login" style="color: black; margin-left: 10px"> Go to sign in</a>
+    <% } else {%>
     <main style="margin: 1em">
       <h3>My URLs</h3>
       <table class="table">
@@ -49,6 +53,7 @@
         </tbody>
       </table>
     </main>
+    <% }%>
     <!-- Bootstrap JS -->
     <script
       src="https://code.jquery.com/jquery-3.3.1.slim.min.js"

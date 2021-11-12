@@ -13,8 +13,8 @@ const generateRandomString = require('../helpers/random_string');
 // urls_index page
 router.get('/', (req, res) => {
   const userId = req.session.userId;
-
   const userUrlList = getUrlsForUser(userId);
+  
   const templateVars = {
     user: userDatabase[userId],
     urls: userUrlList,
@@ -69,10 +69,15 @@ router.get('/:shortURL', (req, res) => {
 router.post('/', (req, res) => {
   const { longURL } = req.body;
   const { userId } = req.session;
+
+  if (!userId) {
+    return res.status(400).render('bad_request');
+  }
+
   const shortURL = generateRandomString(6);
   urlDatabase[shortURL] = { longURL: `https://${longURL}`, userId };
 
-  res.redirect('/urls');
+  res.redirect(`/urls/${shortURL}`);
 });
 
 // Delete URL
@@ -81,11 +86,9 @@ router.post('/:shortURL/delete', (req, res) => {
   const urlKeyToRemove = req.params.shortURL;
   const urlToRemove = urlDatabase[urlKeyToRemove];
 
-  if (userId !== urlToRemove.userId) {
-    console.log('Cannot delete URL that is not created by owner');
-    return res
-      .status(400)
-      .send('Cannot delete URL that is not created by owner');
+  if (!userId || userId !== urlToRemove.userId) {
+    console.log("Cannot delete other's URL");
+    return res.status(400).render('bad_request');
   }
 
   delete urlDatabase[urlKeyToRemove];
@@ -99,7 +102,7 @@ router.post('/:shortURL', (req, res) => {
   const urlToEdit = urlDatabase[urlKeyToEdit];
 
   if (userId !== urlToEdit.userId) {
-    console.log('Cannot edit URL that is not created by owner');
+    console.log("Cannot edit other's URL");
     return res.status(400).send('Cannot edit URL that is not created by owner');
   }
 
